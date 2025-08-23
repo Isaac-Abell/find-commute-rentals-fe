@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Filter, ChevronDown, Search } from 'lucide-react';
 import styles from './styles.jsx';
 
@@ -16,6 +16,79 @@ const FilterSection = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(!compact);
   const [isHovered, setIsHovered] = useState(false);
+  
+  // Local state for compact mode
+  const [localFilters, setLocalFilters] = useState(filters);
+  const [localCommuteType, setLocalCommuteType] = useState(commuteType);
+  const [localSortBy, setLocalSortBy] = useState(sortBy);
+  const [localAscending, setLocalAscending] = useState(ascending);
+
+  // Update local state when props change (for non-compact mode or external updates)
+  useEffect(() => {
+    if (!compact) {
+      setLocalFilters(filters);
+      setLocalCommuteType(commuteType);
+      setLocalSortBy(sortBy);
+      setLocalAscending(ascending);
+    }
+  }, [filters, commuteType, sortBy, ascending, compact]);
+
+  // Handle filter changes
+  const handleFilterChange = (key, value) => {
+    if (compact) {
+      // In compact mode, only update local state
+      setLocalFilters(prev => ({ ...prev, [key]: value }));
+    } else {
+      // In normal mode, update parent immediately
+      onFilterChange(key, value);
+    }
+  };
+
+  const handleCommuteTypeChange = (value) => {
+    if (compact) {
+      setLocalCommuteType(value);
+    } else {
+      onCommuteTypeChange(value);
+    }
+  };
+
+  const handleSortByChange = (value) => {
+    if (compact) {
+      setLocalSortBy(value);
+    } else {
+      onSortByChange(value);
+    }
+  };
+
+  const handleAscendingChange = (value) => {
+    if (compact) {
+      setLocalAscending(value);
+    } else {
+      onAscendingChange(value);
+    }
+  };
+
+  // Handle submit - update parent state and call onSubmit
+  const handleSubmit = () => {
+    if (compact) {
+      // Update all parent state with local values
+      Object.entries(localFilters).forEach(([key, value]) => {
+        if (filters[key] !== value) {
+          onFilterChange(key, value);
+        }
+      });
+      if (commuteType !== localCommuteType) onCommuteTypeChange(localCommuteType);
+      if (sortBy !== localSortBy) onSortByChange(localSortBy);
+      if (ascending !== localAscending) onAscendingChange(localAscending);
+    }
+    onSubmit();
+  };
+
+  // Use local values in compact mode, parent values in normal mode
+  const currentFilters = compact ? localFilters : filters;
+  const currentCommuteType = compact ? localCommuteType : commuteType;
+  const currentSortBy = compact ? localSortBy : sortBy;
+  const currentAscending = compact ? localAscending : ascending;
 
   const containerStyle = compact
     ? { ...styles.bgWhite, ...styles.roundedLg, ...styles.shadow, ...styles.border, ...styles.p4, ...styles.mb6 }
@@ -52,14 +125,14 @@ const FilterSection = ({
                 Commute Type
               </label>
               <select
-                value={commuteType}
-                onChange={(e) => onCommuteTypeChange(e.target.value)}
+                value={currentCommuteType}
+                onChange={(e) => handleCommuteTypeChange(e.target.value)}
                 style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
               >
                 <option value="WALK">Walking</option>
                 <option value="DRIVE">Driving</option>
                 <option value="TRANSIT">Public Transit</option>
-                <option value="BICYCLING">Bicycling</option>
+                <option value="BICYCLE">Bicycling</option>
               </select>
             </div>
 
@@ -69,8 +142,8 @@ const FilterSection = ({
               </label>
               <div style={{ ...styles.flex, gap: '0.5rem' }}>
                 <select
-                  value={sortBy}
-                  onChange={(e) => onSortByChange(e.target.value)}
+                  value={currentSortBy}
+                  onChange={(e) => handleSortByChange(e.target.value)}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}), flex: 1 }}
                 >
                   <option value="list_price">Price</option>
@@ -79,7 +152,7 @@ const FilterSection = ({
                   <option value="beds">Bedrooms</option>
                 </select>
                 <button
-                  onClick={() => onAscendingChange(!ascending)}
+                  onClick={() => handleAscendingChange(!currentAscending)}
                   style={{
                     ...styles.px4,
                     ...styles.py4,
@@ -90,7 +163,7 @@ const FilterSection = ({
                     ...(compact ? { padding: '0.5rem' } : {})
                   }}
                 >
-                  {ascending ? '↑' : '↓'}
+                  {currentAscending ? '↑' : '↓'}
                 </button>
               </div>
             </div>
@@ -107,21 +180,23 @@ const FilterSection = ({
                 <input
                   type="number"
                   placeholder="Min"
-                  value={filters.min_price || ''}
+                  value={currentFilters.min_price || ''}
                   min="0"
                   onChange={(e) => {
                     const newMin = Math.max(0, Number(e.target.value));
-                    onFilterChange('min_price', newMin);
-                    if (filters.max_price !== '' && Number(filters.max_price) < newMin) onFilterChange('max_price', newMin);
+                    handleFilterChange('min_price', newMin);
+                    if (currentFilters.max_price !== '' && Number(currentFilters.max_price) < newMin) {
+                      handleFilterChange('max_price', newMin);
+                    }
                   }}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
                 />
                 <input
                   type="number"
                   placeholder="Max"
-                  value={filters.max_price || ''}
-                  min={filters.min_price || 0}
-                  onChange={(e) => onFilterChange('max_price', Math.max(filters.min_price || 0, Number(e.target.value)))}
+                  value={currentFilters.max_price || ''}
+                  min={currentFilters.min_price || 0}
+                  onChange={(e) => handleFilterChange('max_price', Math.max(currentFilters.min_price || 0, Number(e.target.value)))}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
                 />
               </div>
@@ -136,19 +211,21 @@ const FilterSection = ({
                 <input
                   type="number"
                   placeholder="Min"
-                  value={filters.min_beds || ''}
+                  value={currentFilters.min_beds || ''}
                   onChange={(e) => {
                     const newMin = Math.max(0, Number(e.target.value));
-                    onFilterChange('min_beds', newMin);
-                    if (filters.max_beds !== '' && Number(filters.max_beds) < newMin) onFilterChange('max_beds', newMin);
+                    handleFilterChange('min_beds', newMin);
+                    if (currentFilters.max_beds !== '' && Number(currentFilters.max_beds) < newMin) {
+                      handleFilterChange('max_beds', newMin);
+                    }
                   }}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
                 />
                 <input
                   type="number"
                   placeholder="Max"
-                  value={filters.max_beds || ''}
-                  onChange={(e) => onFilterChange('max_beds', Math.max(filters.min_beds || 0, Number(e.target.value)))}
+                  value={currentFilters.max_beds || ''}
+                  onChange={(e) => handleFilterChange('max_beds', Math.max(currentFilters.min_beds || 0, Number(e.target.value)))}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
                 />
               </div>
@@ -164,11 +241,13 @@ const FilterSection = ({
                   type="number"
                   step="0.5"
                   placeholder="Min"
-                  value={filters.min_baths || ''}
+                  value={currentFilters.min_baths || ''}
                   onChange={(e) => {
                     const newMin = Math.max(0, Number(e.target.value));
-                    onFilterChange('min_baths', newMin);
-                    if (filters.max_baths !== '' && Number(filters.max_baths) < newMin) onFilterChange('max_baths', newMin);
+                    handleFilterChange('min_baths', newMin);
+                    if (currentFilters.max_baths !== '' && Number(currentFilters.max_baths) < newMin) {
+                      handleFilterChange('max_baths', newMin);
+                    }
                   }}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
                 />
@@ -176,8 +255,8 @@ const FilterSection = ({
                   type="number"
                   step="0.5"
                   placeholder="Max"
-                  value={filters.max_baths || ''}
-                  onChange={(e) => onFilterChange('max_baths', Math.max(filters.min_baths || 0, Number(e.target.value)))}
+                  value={currentFilters.max_baths || ''}
+                  onChange={(e) => handleFilterChange('max_baths', Math.max(currentFilters.min_baths || 0, Number(e.target.value)))}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
                 />
               </div>
@@ -185,7 +264,7 @@ const FilterSection = ({
           </div>
           <div style={{ marginTop: '1rem', textAlign: 'right' }}>
             <button
-              onClick={onSubmit}
+              onClick={handleSubmit}
               style={{
                 ...styles.button,
                 width: '100%',

@@ -108,7 +108,7 @@ const ListingCard = ({ listing }) => {
               {listing.formatted_address}
             </h3>
             <p style={{ ...styles.textSm, ...styles.textGray600 }}>
-              {listing.city}, {listing.region}
+              {listing.city}
             </p>
           </div>
           <ExternalLink

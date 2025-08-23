@@ -14,6 +14,7 @@ const ResultsPage = ({ searchParams, onBack }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [filters, setFilters] = useState(searchParams.filters || {});
   const [commuteType, setCommuteType] = useState(searchParams.commute_type);
   const [sortBy, setSortBy] = useState(searchParams.sort_by);
@@ -21,7 +22,7 @@ const ResultsPage = ({ searchParams, onBack }) => {
 
   const { searchListings, loading, error, clearError } = useRealEstateAPI();
 
-    // Sort listings client-side when sortBy is commute_seconds
+  // Sort listings client-side when sortBy is commute_seconds
   const sortedListings = useMemo(() => {
     if (sortBy !== 'commute_time') {
       return listings;
@@ -41,8 +42,14 @@ const ResultsPage = ({ searchParams, onBack }) => {
     return sorted;
   }, [listings, sortBy, ascending]);
 
-  const loadListings = useCallback(async (pageNum, reset = false) => {
+  const loadListings = useCallback(async (pageNum, reset = false, isSubmit = false) => {
     try {
+      if (isSubmit) {
+        setSubmitLoading(true);
+        setListings([]);
+        clearError();
+      }
+
       const params = {
         ...searchParams,
         filters,
@@ -67,19 +74,20 @@ const ResultsPage = ({ searchParams, onBack }) => {
       // Error is handled by the hook
     } finally {
       setInitialLoading(false);
+      setSubmitLoading(false);
     }
-  }, [searchListings, searchParams, filters, commuteType, sortBy, ascending]);
+  }, [searchListings, searchParams, filters, commuteType, sortBy, ascending, clearError]);
 
-  // Load initial results and reset when filters change
+  // Load initial results - only on mount, not when filters change
   useEffect(() => {
     loadListings(1, true);
     setPage(1);
-  }, [filters, commuteType, sortBy, ascending]);
+  }, []); // Empty dependency array - only run on mount
 
   // Infinite scroll handler
   useEffect(() => {
     const handleScroll = () => {
-      if (loading || !hasMore) return;
+      if (loading || !hasMore || submitLoading) return; // Don't load more during submit
       
       const scrollTop = document.documentElement.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight;
@@ -94,19 +102,31 @@ const ResultsPage = ({ searchParams, onBack }) => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [loading, hasMore, page, loadListings]);
+  }, [loading, hasMore, page, loadListings, submitLoading]);
 
   const handleFilterChange = (key, value) => {
-    clearError(); // Clear any previous errors when filters change
     setFilters(prev => ({
       ...prev,
       [key]: value
     }));
   };
 
+  // New handler for when filters are submitted
+  const handleFilterSubmit = () => {
+    loadListings(1, true, true); // Pass isSubmit = true
+    setPage(1);
+    
+    // Scroll to top to show the loading spinner
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   const handleRetry = () => {
     clearError();
     setInitialLoading(true);
+    setSubmitLoading(false);
     loadListings(1, true);
     setPage(1);
   };
@@ -119,7 +139,7 @@ const ResultsPage = ({ searchParams, onBack }) => {
     );
   }
 
-  if (error && listings.length === 0) {
+  if (error && listings.length === 0 && !submitLoading) {
     return (
       <div style={{ ...styles.minHeight, ...styles.bgGray50 }}>
         <div style={{ ...styles.bgWhite, ...styles.shadow, borderBottom: '1px solid #E5E7EB' }}>
@@ -176,7 +196,7 @@ const ResultsPage = ({ searchParams, onBack }) => {
               Properties near "{searchParams.user_address}"
             </h1>
             <div style={{ ...styles.textSm, ...styles.textGray600 }}>
-              {sortedListings.length} properties found
+              {submitLoading ? 'Searching...' : `${sortedListings.length} properties found`}
             </div>
           </div>
         </div>
@@ -193,9 +213,10 @@ const ResultsPage = ({ searchParams, onBack }) => {
           ascending={ascending}
           onAscendingChange={setAscending}
           compact={true}
+          onSubmit={handleFilterSubmit} // Use the new submit handler
         />
 
-        {error && (
+        {error && !submitLoading && (
           <div style={{ 
             ...styles.mb4, 
             ...styles.p4, 
@@ -222,21 +243,35 @@ const ResultsPage = ({ searchParams, onBack }) => {
           </div>
         )}
 
-        <div style={{ ...styles.grid, ...styles.gridAutoFill, ...styles.gap6 }}>
-          {sortedListings.map((listing, index) => (
-            <ListingCard key={`${listing.property_url}-${index}`} listing={listing} />
-          ))}
-        </div>
+        {/* Show loading spinner during submit */}
+        {submitLoading && (
+          <div style={{ ...styles.flex, ...styles.justifyCenter, ...styles.py12 }}>
+            <LoadingSpinner />
+            <div style={{ ...styles.ml4, ...styles.textGray600 }}>
+              Searching for properties...
+            </div>
+          </div>
+        )}
 
-        {loading && <LoadingSpinner />}
+        {/* Only show listings when not in submit loading state */}
+        {!submitLoading && (
+          <div style={{ ...styles.grid, ...styles.gridAutoFill, ...styles.gap6 }}>
+            {sortedListings.map((listing, index) => (
+              <ListingCard key={`${listing.property_url}-${index}`} listing={listing} />
+            ))}
+          </div>
+        )}
+
+        {/* Show regular loading spinner for pagination (not submit) */}
+        {loading && !submitLoading && <LoadingSpinner />}
         
-        {!hasMore && listings.length > 0 && (
+        {!hasMore && listings.length > 0 && !submitLoading && (
           <div style={{ ...styles.textCenter, ...styles.py8, ...styles.textGray600 }}>
             No more properties to load
           </div>
         )}
 
-        {listings.length === 0 && !loading && !error && (
+        {listings.length === 0 && !loading && !error && !submitLoading && (
           <div style={{ ...styles.textCenter, ...styles.py12 }}>
             <p style={{ ...styles.textGray600, ...styles.textLg }}>
               No properties found matching your criteria
