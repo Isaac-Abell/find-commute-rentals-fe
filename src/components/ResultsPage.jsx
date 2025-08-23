@@ -1,5 +1,5 @@
 // src/components/ResultsPage.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import useRealEstateAPI from '../hooks/useRealEstateApi.js';
 import FilterSection from './FilterSection';
@@ -20,6 +20,26 @@ const ResultsPage = ({ searchParams, onBack }) => {
   const [ascending, setAscending] = useState(searchParams.ascending);
 
   const { searchListings, loading, error, clearError } = useRealEstateAPI();
+
+    // Sort listings client-side when sortBy is commute_seconds
+  const sortedListings = useMemo(() => {
+    if (sortBy !== 'commute_time') {
+      return listings;
+    }
+
+    // Create a copy to avoid mutating the original array
+    const sorted = [...listings].sort((a, b) => {
+      const aCommute = a.commute_minutes || Infinity;
+      const bCommute = b.commute_minutes || Infinity;
+      
+      if (ascending) {
+        return aCommute - bCommute;
+      } else {
+        return bCommute - aCommute;
+      }
+    });
+    return sorted;
+  }, [listings, sortBy, ascending]);
 
   const loadListings = useCallback(async (pageNum, reset = false) => {
     try {
@@ -156,7 +176,7 @@ const ResultsPage = ({ searchParams, onBack }) => {
               Properties near "{searchParams.user_address}"
             </h1>
             <div style={{ ...styles.textSm, ...styles.textGray600 }}>
-              {listings.length} properties found
+              {sortedListings.length} properties found
             </div>
           </div>
         </div>
@@ -203,7 +223,7 @@ const ResultsPage = ({ searchParams, onBack }) => {
         )}
 
         <div style={{ ...styles.grid, ...styles.gridAutoFill, ...styles.gap6 }}>
-          {listings.map((listing, index) => (
+          {sortedListings.map((listing, index) => (
             <ListingCard key={`${listing.property_url}-${index}`} listing={listing} />
           ))}
         </div>

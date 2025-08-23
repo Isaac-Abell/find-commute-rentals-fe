@@ -75,7 +75,7 @@ const FilterSection = ({
                 >
                   <option value="list_price">Price</option>
                   <option value="distance">Distance</option>
-                  <option value="commute_seconds">Commute Time</option>
+                  <option value="commute_time">Commute Time</option>
                   <option value="beds">Bedrooms</option>
                 </select>
                 <button

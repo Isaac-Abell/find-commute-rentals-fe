@@ -14,6 +14,10 @@ const ListingCard = ({ listing }) => {
     }).format(price);
 
   // Format distance in meters or km
+  const formatTime = (min) => {
+    if (min < 60) return `${Math.round(min)} min`;
+    return `${Math.floor(min / 60)} hr ${Math.round(min % 60)} min`;
+  };
   const formatDistance = (km) => {
     if (km < 1) return `${Math.round(km * 1000)}m`;
     return `${km.toFixed(1)}km`;
@@ -150,7 +154,7 @@ const ListingCard = ({ listing }) => {
 
           <div style={{ ...styles.flex, ...styles.alignCenter, color: '#6B7280' }}>
             <Clock size={16} style={{ marginRight: '0.25rem' }} />
-            <span style={styles.textSm}>{Math.round(listing.commute_minutes)} min</span>
+            <span style={styles.textSm}>{formatTime(listing.commute_minutes)}</span>
           </div>
         </div>
       </div>
