@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import SearchPage from './SearchPage'
 import ResultsPage from './ResultsPage'
-import styles from './styles.jsx';
 
 const RealEstateApp = () => {
   const [currentPage, setCurrentPage] = useState('search')
