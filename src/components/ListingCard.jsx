@@ -126,7 +126,7 @@ const ListingCard = ({ listing }) => {
             marginBottom: '1rem',
           }}
         >
-          {formatPrice(listing.list_price)}
+          {formatPrice(listing.list_price)}/month
         </div>
 
         {/* Info Grid */}
