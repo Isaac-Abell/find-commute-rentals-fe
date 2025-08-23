@@ -33,6 +33,7 @@ const styles = {
   fontBold: { fontWeight: 'bold' },
   fontSemibold: { fontWeight: '600' },
   fontMedium: { fontWeight: '500' },
+  textXSm: { fontSize: '0.7rem' },
   textSm: { fontSize: '0.875rem' },
   textBase: { fontSize: '1rem' },
   textLg: { fontSize: '1.125rem' },

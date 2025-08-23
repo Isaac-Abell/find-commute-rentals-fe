@@ -11,9 +11,7 @@ const useRealEstateAPI = () => {
     setLoading(true);
     setError(null);
 
-
     try {
-        console.log(JSON.stringify(searchParams))
       const response = await fetch(API_BASE_URL, {
         method: 'POST',
         headers: {
@@ -22,17 +20,20 @@ const useRealEstateAPI = () => {
         body: JSON.stringify(searchParams)
       });
 
-
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+        let errorMessage;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData?.error || `API Error: ${response.status} - ${response.statusText}`;
+        } catch {
+          errorMessage = `API Error: ${response.status} - ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
 
-      console.log(data)
-      
-      // Handle different response formats
-      if (data.error) {
+      if (data?.error) {
         throw new Error(data.error);
       }
 

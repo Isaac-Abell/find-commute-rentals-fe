@@ -1,9 +1,7 @@
-import React, { useState } from 'react'
-import { MapPin } from 'lucide-react';
+import React, { useState } from 'react';
 import FilterSection from './FilterSection';
+import AddressSearch from './AddressSearch';
 import styles from './styles.jsx';
-import { Search } from 'lucide-react';
-
 
 const SearchPage = ({ onSearch }) => {
   const [address, setAddress] = useState('');
@@ -11,7 +9,6 @@ const SearchPage = ({ onSearch }) => {
   const [commuteType, setCommuteType] = useState('DRIVE');
   const [sortBy, setSortBy] = useState('list_price');
   const [ascending, setAscending] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({
@@ -22,7 +19,7 @@ const SearchPage = ({ onSearch }) => {
 
   const handleSubmit = () => {
     if (!address.trim()) return;
-    
+
     const searchParams = {
       user_address: address,
       commute_type: commuteType,
@@ -32,7 +29,7 @@ const SearchPage = ({ onSearch }) => {
       sort_by: sortBy,
       ascending
     };
-    
+
     onSearch(searchParams);
   };
 
@@ -43,28 +40,16 @@ const SearchPage = ({ onSearch }) => {
           <h1 style={{ ...styles.text4xl, ...styles.fontBold, ...styles.textGray800, ...styles.mb2 }}>
             Find Your Perfect Home
           </h1>
-          <p style={styles.textGray600}>
+          <p style={{ ...styles.textGray600, ...styles.textBase }}>
             Search for Rentals near your desired location
           </p>
+          <p style={{ ...styles.textGray600, ...styles.textXSm, marginTop: '4px' }}>
+            Currently supports: Bay Area, Los Angeles, New York, Seattle, Boston, Austin, Denver
+          </p>
         </div>
-        
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div>
-            <label style={{ display: 'block', ...styles.textSm, ...styles.fontMedium, ...styles.textGray700, ...styles.mb2 }}>
-              Address
-            </label>
-            <div style={{ position: 'relative' }}>
-              <MapPin size={20} style={{ position: 'absolute', left: '0.75rem', top: '0.75rem', color: '#9CA3AF' }} />
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                style={{ ...styles.input, paddingLeft: '2.5rem' }}
-                placeholder="Enter your address..."
-                required
-              />
-            </div>
-          </div>
+          <AddressSearch value={address} onChange={setAddress} />
 
           <FilterSection
             filters={filters}
@@ -75,21 +60,8 @@ const SearchPage = ({ onSearch }) => {
             onSortByChange={setSortBy}
             ascending={ascending}
             onAscendingChange={setAscending}
+            onSubmit={handleSubmit}
           />
-
-          <button
-            onClick={handleSubmit}
-            style={{
-              ...styles.button,
-              width: '100%',
-              ...(isHovered ? styles.buttonHover : {})
-            }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            <Search size={20} style={styles.mr2} />
-            Search Properties
-          </button>
         </div>
       </div>
     </div>
