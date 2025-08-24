@@ -69,20 +69,19 @@ const FilterSection = ({
     }
   };
 
-  // Handle submit - update parent state and call onSubmit
+  // Handle submit - update parent state and call onSubmit with local values
   const handleSubmit = () => {
     if (compact) {
-      // Update all parent state with local values
-      Object.entries(localFilters).forEach(([key, value]) => {
-        if (filters[key] !== value) {
-          onFilterChange(key, value);
-        }
+      // Pass the local values directly to onSubmit instead of updating parent state first
+      onSubmit({
+        filters: localFilters,
+        commuteType: localCommuteType,
+        sortBy: localSortBy,
+        ascending: localAscending
       });
-      if (commuteType !== localCommuteType) onCommuteTypeChange(localCommuteType);
-      if (sortBy !== localSortBy) onSortByChange(localSortBy);
-      if (ascending !== localAscending) onAscendingChange(localAscending);
+    } else {
+      onSubmit();
     }
-    onSubmit();
   };
 
   // Use local values in compact mode, parent values in normal mode
@@ -164,9 +163,9 @@ const FilterSection = ({
                     e.target.style.boxShadow = 'none';
                   }}
                 >
+                  <option value="commute_time">Commute Time</option>
                   <option value="list_price">Price</option>
                   <option value="distance">Distance</option>
-                  <option value="commute_time">Commute Time</option>
                   <option value="beds">Bedrooms</option>
                 </select>
               </div>
@@ -178,7 +177,7 @@ const FilterSection = ({
             {/* Price */}
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', ...styles.fontMedium, ...styles.textGray700, ...styles.mb2 }}>
-                Price Range
+                Price
               </label>
               <div style={{ ...styles.flex, gap: '0.5rem' }}>
                 <input

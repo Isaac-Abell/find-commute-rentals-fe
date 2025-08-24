@@ -28,8 +28,8 @@ const ListingCard = ({ listing, commuteType }) => {
     else if (commuteType === 'DRIVE') {
       commute = "drive"
     }
-    if (min < 60) return `${Math.round(min)} minute ${commute}`;
-    return `${Math.floor(min / 60)} hour ${Math.round(min % 60)} minute ${commute}`;
+    if (min < 60) return `${Math.round(min)} min ${commute}`;
+    return `${Math.floor(min / 60)} hr ${Math.round(min % 60)} min ${commute}`;
   };
   const formatDistance = (km) => {
     if (km < 1) return `${Math.round(km * 1000)}m`;

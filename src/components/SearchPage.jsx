@@ -6,8 +6,8 @@ import styles from './styles.jsx';
 const SearchPage = ({ onSearch }) => {
   const [address, setAddress] = useState('');
   const [filters, setFilters] = useState({});
-  const [commuteType, setCommuteType] = useState('DRIVE');
-  const [sortBy, setSortBy] = useState('list_price');
+  const [commuteType, setCommuteType] = useState('WALK');
+  const [sortBy, setSortBy] = useState('commute_time');
   const [ascending, setAscending] = useState(true);
 
   const supportedRegions = [

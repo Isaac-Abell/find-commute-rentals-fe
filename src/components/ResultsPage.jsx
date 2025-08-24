@@ -42,7 +42,7 @@ const ResultsPage = ({ searchParams, onBack }) => {
     return sorted;
   }, [listings, sortBy, ascending]);
 
-  const loadListings = useCallback(async (pageNum, reset = false, isSubmit = false) => {
+  const loadListings = useCallback(async (pageNum, reset = false, isSubmit = false, overrideParams = null) => {
     try {
       if (isSubmit) {
         setSubmitLoading(true);
@@ -50,7 +50,16 @@ const ResultsPage = ({ searchParams, onBack }) => {
         clearError();
       }
 
-      const params = {
+      // Use override params if provided (for compact mode submit), otherwise use current state
+      const params = overrideParams ? {
+        ...searchParams,
+        filters: overrideParams.filters,
+        commute_type: overrideParams.commute_type,
+        sort_by: overrideParams.sort_by,
+        ascending: overrideParams.ascending,
+        page: pageNum,
+        page_size: 20
+      } : {
         ...searchParams,
         filters,
         commute_type: commuteType,
@@ -59,7 +68,15 @@ const ResultsPage = ({ searchParams, onBack }) => {
         page: pageNum,
         page_size: 20
       };
-      
+
+      // If we have override params, also update the component state
+      if (overrideParams) {
+        setFilters(overrideParams.filters);
+        setCommuteType(overrideParams.commute_type);
+        setSortBy(overrideParams.sort_by);
+        setAscending(overrideParams.ascending);
+      }
+
       const response = await searchListings(params);
       
       if (reset) {
@@ -76,7 +93,7 @@ const ResultsPage = ({ searchParams, onBack }) => {
       setInitialLoading(false);
       setSubmitLoading(false);
     }
-  }, [searchListings, searchParams, filters, commuteType, sortBy, ascending, clearError]);
+  }, [searchListings, searchParams, clearError]);
 
   // Load initial results - only on mount, not when filters change
   useEffect(() => {
@@ -111,9 +128,25 @@ const ResultsPage = ({ searchParams, onBack }) => {
     }));
   };
 
-  // New handler for when filters are submitted
-  const handleFilterSubmit = () => {
-    loadListings(1, true, true); // Pass isSubmit = true
+  // Updated handler for when filters are submitted
+  const handleFilterSubmit = (compactParams = null) => {
+    if (compactParams) {
+      // Handle compact mode - params are passed directly
+      const apiParams = {
+        ...searchParams,
+        filters: compactParams.filters,
+        commute_type: compactParams.commuteType,
+        sort_by: compactParams.sortBy,
+        ascending: compactParams.ascending,
+        page: 1,
+        page_size: 20
+      };
+      loadListings(1, true, true, apiParams);
+    } else {
+      // Handle normal mode - use current state
+      loadListings(1, true, true);
+    }
+    
     setPage(1);
     
     // Scroll to top to show the loading spinner
@@ -210,7 +243,7 @@ const ResultsPage = ({ searchParams, onBack }) => {
           ascending={ascending}
           onAscendingChange={setAscending}
           compact={true}
-          onSubmit={handleFilterSubmit} // Use the new submit handler
+          onSubmit={handleFilterSubmit} // Updated to handle both modes
         />
 
         {error && !submitLoading && (
