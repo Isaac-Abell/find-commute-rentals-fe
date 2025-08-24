@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Bed, Bath, MapPin, Clock, ExternalLink } from 'lucide-react';
 import styles from './styles.jsx';
 
-const ListingCard = ({ listing }) => {
+const ListingCard = ({ listing, commuteType }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   // Format price as USD currency
@@ -14,9 +14,22 @@ const ListingCard = ({ listing }) => {
     }).format(price);
 
   // Format distance in meters or km
-  const formatTime = (min) => {
-    if (min < 60) return `${Math.round(min)} min`;
-    return `${Math.floor(min / 60)} hr ${Math.round(min % 60)} min`;
+  const formatTime = (min, commuteType) => {
+    let commute = ""
+    if (commuteType === 'WALK') {
+      commute = "walk"
+    }
+    else if (commuteType === 'BIKE') {
+      commute = "bike"
+    }
+    else if (commuteType === 'TRANSIT') {
+      commute = "by public transit"
+    }
+    else if (commuteType === 'DRIVE') {
+      commute = "drive"
+    }
+    if (min < 60) return `${Math.round(min)} minute ${commute}`;
+    return `${Math.floor(min / 60)} hour ${Math.round(min % 60)} minute ${commute}`;
   };
   const formatDistance = (km) => {
     if (km < 1) return `${Math.round(km * 1000)}m`;
@@ -154,7 +167,7 @@ const ListingCard = ({ listing }) => {
 
           <div style={{ ...styles.flex, ...styles.alignCenter, color: '#6B7280' }}>
             <Clock size={16} style={{ marginRight: '0.25rem' }} />
-            <span style={styles.textSm}>{formatTime(listing.commute_minutes)}</span>
+            <span style={styles.textSm}>{formatTime(listing.commute_minutes, commuteType)}</span>
           </div>
         </div>
       </div>

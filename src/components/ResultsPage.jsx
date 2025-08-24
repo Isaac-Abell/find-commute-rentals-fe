@@ -172,10 +172,10 @@ const ResultsPage = ({ searchParams, onBack }) => {
   }
 
   return (
-    <div style={{ ...styles.minHeight, ...styles.bgGray50 }}>
+    <div style={{ ...styles.searchPage, ...styles.minHeight, ...styles.bgGray50 }}>
       <div style={{ ...styles.bgWhite, ...styles.shadow, borderBottom: '1px solid #E5E7EB' }}>
         <div style={{ ...styles.container, ...styles.py4 }}>
-          <div style={{ ...styles.flex, ...styles.alignCenter, ...styles.justifyBetween, ...styles.mb4 }}>
+          <div style={{ ...styles.alignCenter, ...styles.justifyBetween, ...styles.mb4 }}>
             <button
               onClick={onBack}
               style={{ 
@@ -195,9 +195,6 @@ const ResultsPage = ({ searchParams, onBack }) => {
             <h1 style={{ ...styles.textXl, ...styles.fontSemibold, ...styles.textGray900 }}>
               Properties near "{searchParams.user_address}"
             </h1>
-            <div style={{ ...styles.textSm, ...styles.textGray600 }}>
-              {submitLoading ? 'Searching...' : `${sortedListings.length} properties found`}
-            </div>
           </div>
         </div>
       </div>
@@ -257,7 +254,7 @@ const ResultsPage = ({ searchParams, onBack }) => {
         {!submitLoading && (
           <div style={{ ...styles.grid, ...styles.gridAutoFill, ...styles.gap6 }}>
             {sortedListings.map((listing, index) => (
-              <ListingCard key={`${listing.property_url}-${index}`} listing={listing} />
+              <ListingCard key={`${listing.property_url}-${index}`} listing={listing} commuteType={commuteType} />
             ))}
           </div>
         )}
