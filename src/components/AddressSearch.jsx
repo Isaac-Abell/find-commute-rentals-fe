@@ -34,6 +34,22 @@ const AddressSearch = ({ value, onChange }) => {
     return () => controller.abort();
   }, [value]);
 
+  const styles = {
+    textSm: { fontSize: '0.875rem' },
+    fontMedium: { fontWeight: '500' },
+    textGray700: { color: '#374151' },
+    mb2: { marginBottom: '0.5rem' },
+    input: {
+      width: '100%',
+      padding: '0.75rem',
+      border: '1px solid #D1D5DB',
+      borderRadius: '0.5rem',
+      fontSize: '1rem',
+      outline: 'none',
+      transition: 'all 0.2s',
+    }
+  };
+
   return (
     <div style={{ position: 'relative', width: '100%' }}>
       <label style={{ display: 'block', ...styles.textSm, ...styles.fontMedium, ...styles.textGray700, ...styles.mb2 }}>
@@ -46,7 +62,24 @@ const AddressSearch = ({ value, onChange }) => {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Enter your address..."
-          style={{ ...styles.input, paddingLeft: '2.5rem', width: '100%' }}
+          style={{
+            ...styles.input,
+            paddingLeft: '2.5rem',
+            width: '100%',
+            boxShadow: 'none',
+            ':focus': {
+              borderColor: '#7B00FF',
+              boxShadow: '0 0 0 3px rgba(123, 0, 255, 0.1)'
+            }
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = '#7B00FF';
+            e.target.style.boxShadow = '0 0 0 3px rgba(123, 0, 255, 0.1)';
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = '#D1D5DB';
+            e.target.style.boxShadow = 'none';
+          }}
           required
         />
         {suggestions.length > 0 && (
@@ -61,6 +94,8 @@ const AddressSearch = ({ value, onChange }) => {
               maxHeight: '200px',
               overflowY: 'auto',
               zIndex: 1000,
+              borderRadius: '0.5rem',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)'
             }}
           >
             {suggestions.map((s) => (
@@ -70,7 +105,18 @@ const AddressSearch = ({ value, onChange }) => {
                   onChange(s.display_name);
                   setSuggestions([]);
                 }}
-                style={{ padding: '0.5rem', cursor: 'pointer' }}
+                style={{
+                  padding: '0.75rem',
+                  cursor: 'pointer',
+                  borderBottom: '1px solid #F3F4F6',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#F9FAFB';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'white';
+                }}
               >
                 {s.display_name}
               </li>

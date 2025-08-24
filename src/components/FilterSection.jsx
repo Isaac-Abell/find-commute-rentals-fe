@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Filter, ChevronDown, Search } from 'lucide-react';
 import styles from './styles.jsx';
 
+// Your actual FilterSection component with updated colors
 const FilterSection = ({
   filters,
   onFilterChange,
@@ -16,7 +17,7 @@ const FilterSection = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(!compact);
   const [isHovered, setIsHovered] = useState(false);
-  
+
   // Local state for compact mode
   const [localFilters, setLocalFilters] = useState(filters);
   const [localCommuteType, setLocalCommuteType] = useState(commuteType);
@@ -119,7 +120,7 @@ const FilterSection = ({
       {(!compact || isExpanded) && (
         <>
           {/* Commute Type & Sort By */}
-          <div style={{ ...styles.grid, ...styles.gridCols2, ...styles.gap4, ...styles.mb4 }}>
+          <div style={{ ...styles.gap4, ...styles.mb4 }}>
             <div>
               <label style={{ display: 'block', ...styles.textSm, ...styles.fontMedium, ...styles.textGray700, ...styles.mb2 }}>
                 Commute Type
@@ -128,6 +129,14 @@ const FilterSection = ({
                 value={currentCommuteType}
                 onChange={(e) => handleCommuteTypeChange(e.target.value)}
                 style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#7B00FF';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(123, 0, 255, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#D1D5DB';
+                  e.target.style.boxShadow = 'none';
+                }}
               >
                 <option value="WALK">Walking</option>
                 <option value="DRIVE">Driving</option>
@@ -135,7 +144,8 @@ const FilterSection = ({
                 <option value="BICYCLE">Bicycling</option>
               </select>
             </div>
-
+          </div>
+          <div style={{ ...styles.gap4, ...styles.mb4 }}>
             <div>
               <label style={{ display: 'block', ...styles.textSm, ...styles.fontMedium, ...styles.textGray700, ...styles.mb2 }}>
                 Sort By
@@ -145,32 +155,26 @@ const FilterSection = ({
                   value={currentSortBy}
                   onChange={(e) => handleSortByChange(e.target.value)}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}), flex: 1 }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#7B00FF';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(123, 0, 255, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#D1D5DB';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 >
                   <option value="list_price">Price</option>
                   <option value="distance">Distance</option>
                   <option value="commute_time">Commute Time</option>
                   <option value="beds">Bedrooms</option>
                 </select>
-                <button
-                  onClick={() => handleAscendingChange(!currentAscending)}
-                  style={{
-                    ...styles.px4,
-                    ...styles.py4,
-                    ...styles.border,
-                    ...styles.roundedLg,
-                    background: 'white',
-                    ...styles.cursorPointer,
-                    ...(compact ? { padding: '0.5rem' } : {})
-                  }}
-                >
-                  {currentAscending ? '↑' : '↓'}
-                </button>
               </div>
             </div>
           </div>
 
           {/* Price, Beds, Baths */}
-          <div style={{ ...styles.grid, ...styles.gridCols2, ...styles.gap4 }}>
+          <div style={{ ...styles.gap4, ...styles.mb4 }}>
             {/* Price */}
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', ...styles.fontMedium, ...styles.textGray700, ...styles.mb2 }}>
@@ -179,30 +183,29 @@ const FilterSection = ({
               <div style={{ ...styles.flex, gap: '0.5rem' }}>
                 <input
                   type="number"
-                  placeholder="Min"
-                  value={currentFilters.min_price || ''}
+                  placeholder="Max Price"
+                  value={currentFilters.max_price || ''}
                   min="0"
                   onChange={(e) => {
-                    const newMin = Math.max(0, Number(e.target.value));
-                    handleFilterChange('min_price', newMin);
-                    if (currentFilters.max_price !== '' && Number(currentFilters.max_price) < newMin) {
-                      handleFilterChange('max_price', newMin);
-                    }
+                    const newMax = Math.max(0, Number(e.target.value));
+                    handleFilterChange('max_price', newMax);
                   }}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={currentFilters.max_price || ''}
-                  min={currentFilters.min_price || 0}
-                  onChange={(e) => handleFilterChange('max_price', Math.max(currentFilters.min_price || 0, Number(e.target.value)))}
-                  style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#7B00FF';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(123, 0, 255, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#D1D5DB';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
               </div>
             </div>
+          </div>
 
-            {/* Bedrooms */}
+          {/* Bedrooms */}
+          <div style={{ ...styles.gap4, ...styles.mb4 }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', ...styles.fontMedium, ...styles.textGray700, ...styles.mb2 }}>
                 Bedrooms
@@ -210,54 +213,51 @@ const FilterSection = ({
               <div style={{ ...styles.flex, gap: '0.5rem' }}>
                 <input
                   type="number"
-                  placeholder="Min"
+                  placeholder="Min Beds"
                   value={currentFilters.min_beds || ''}
                   onChange={(e) => {
                     const newMin = Math.max(0, Number(e.target.value));
                     handleFilterChange('min_beds', newMin);
-                    if (currentFilters.max_beds !== '' && Number(currentFilters.max_beds) < newMin) {
-                      handleFilterChange('max_beds', newMin);
-                    }
                   }}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={currentFilters.max_beds || ''}
-                  onChange={(e) => handleFilterChange('max_beds', Math.max(currentFilters.min_beds || 0, Number(e.target.value)))}
-                  style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#7B00FF';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(123, 0, 255, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#D1D5DB';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
               </div>
             </div>
+          </div>
 
-            {/* Bathrooms */}
-            <div style={{ gridColumn: compact ? 'span 2' : 'auto' }}>
+          {/* Bathrooms */}
+          <div style={{ ...styles.gap4, ...styles.mb4 }}>
+            <div>
               <label style={{ display: 'block', fontSize: '0.75rem', ...styles.fontMedium, ...styles.textGray700, ...styles.mb2 }}>
                 Bathrooms
               </label>
-              <div style={{ ...styles.flex, gap: '0.5rem', maxWidth: compact ? '100%' : '24rem' }}>
+              <div style={{ ...styles.flex, gap: '0.5rem' }}>
                 <input
                   type="number"
                   step="0.5"
-                  placeholder="Min"
+                  placeholder="Min Bathrooms"
                   value={currentFilters.min_baths || ''}
                   onChange={(e) => {
                     const newMin = Math.max(0, Number(e.target.value));
                     handleFilterChange('min_baths', newMin);
-                    if (currentFilters.max_baths !== '' && Number(currentFilters.max_baths) < newMin) {
-                      handleFilterChange('max_baths', newMin);
-                    }
                   }}
                   style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
-                />
-                <input
-                  type="number"
-                  step="0.5"
-                  placeholder="Max"
-                  value={currentFilters.max_baths || ''}
-                  onChange={(e) => handleFilterChange('max_baths', Math.max(currentFilters.min_baths || 0, Number(e.target.value)))}
-                  style={{ ...styles.input, ...(compact ? { fontSize: '0.875rem', padding: '0.5rem' } : {}) }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#7B00FF';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(123, 0, 255, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#D1D5DB';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
               </div>
             </div>
@@ -278,8 +278,9 @@ const FilterSection = ({
             </button>
           </div>
         </>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 

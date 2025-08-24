@@ -6,7 +6,7 @@ const LoadingSpinner = () => (
       width: '2rem',
       height: '2rem',
       border: '2px solid #E5E7EB',
-      borderTop: '2px solid #2563EB',
+      borderTop: '2px solid #7e22ce',
       borderRadius: '50%',
       animation: 'spin 1s linear infinite'
     }}></div>
