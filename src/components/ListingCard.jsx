@@ -152,12 +152,12 @@ const ListingCard = ({ listing, commuteType }) => {
         >
           <div style={{ ...styles.flex, ...styles.alignCenter, color: '#6B7280' }}>
             <Bed size={16} style={{ marginRight: '0.25rem' }} />
-            <span style={styles.textSm}>{listing.beds} beds</span>
+            <span style={styles.textSm}>{listing.beds} {listing.beds > 1 ? "beds" : "bed"}</span>
           </div>
 
           <div style={{ ...styles.flex, ...styles.alignCenter, color: '#6B7280' }}>
             <Bath size={16} style={{ marginRight: '0.25rem' }} />
-            <span style={styles.textSm}>{totalBaths} baths</span>
+            <span style={styles.textSm}>{totalBaths} {totalBaths > 1 ? "baths" : "bath"}</span>
           </div>
 
           <div style={{ ...styles.flex, ...styles.alignCenter, color: '#6B7280' }}>

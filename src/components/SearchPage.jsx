@@ -17,7 +17,14 @@ const SearchPage = ({ onSearch }) => {
     'Seattle',
     'Boston',
     'Austin',
-    'Denver'
+    'Denver',
+    'Miami',
+    'Chicago',
+    'Washington, D.C.',
+    'Phoenix',
+    'Philadelphia',
+    'Atlanta',
+    'Salt Lake City',
   ];
 
   const handleFilterChange = (key, value) => {

@@ -1,5 +1,3 @@
-// Existing imports and component logic remain unchanged
-
 const styles = {
   // --- Existing Styles (Unchanged) ---
   minHeight: { minHeight: '100vh' },
