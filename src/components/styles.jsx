@@ -33,7 +33,8 @@ const styles = {
   fontSemibold: { fontWeight: '600' },
   fontMedium: { fontWeight: '500' },
   textXSm: { fontSize: '0.7rem' },
-  textSm: { fontSize: '0.875rem' },
+  textSm: { fontSize: '1.05rem' },
+  textMdBold: { fontSize: '1.05rem', fontWeight: '500' },
   textBase: { fontSize: '1rem' },
   textLg: { fontSize: '1.125rem' },
   textXl: { fontSize: '1.25rem' },
@@ -41,7 +42,7 @@ const styles = {
   text4xl: { fontSize: '2.25rem' },
 
   // Colors
-  textGray600: { color: '#6B7280' },
+  textGray600: { color: '#4B5563' },
   textGray700: { color: '#374151' },
   textGray800: { color: '#1F2937' },
   textGray900: { color: '#111827' },

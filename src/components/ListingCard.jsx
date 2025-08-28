@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bed, Bath, MapPin, Clock, ExternalLink } from 'lucide-react';
+import { Bed, Bath, MapPin, Clock } from 'lucide-react';
 import styles from './styles.jsx';
 
 const ListingCard = ({ listing, commuteType }) => {
@@ -13,24 +13,19 @@ const ListingCard = ({ listing, commuteType }) => {
       maximumFractionDigits: 0,
     }).format(price);
 
-  // Format distance in meters or km
+  // Format commute time
   const formatTime = (min, commuteType) => {
-    let commute = ""
-    if (commuteType === 'WALK') {
-      commute = "walk"
-    }
-    else if (commuteType === 'BIKE') {
-      commute = "bike"
-    }
-    else if (commuteType === 'TRANSIT') {
-      commute = "by public transit"
-    }
-    else if (commuteType === 'DRIVE') {
-      commute = "drive"
-    }
+    let commute = '';
+    if (commuteType === 'walking') commute = 'walk';
+    else if (commuteType === 'bicycling') commute = 'bike';
+    else if (commuteType === 'transit') commute = 'by public transit';
+    else if (commuteType === 'driving') commute = 'drive';
+
     if (min < 60) return `${Math.round(min)} min ${commute}`;
     return `${Math.floor(min / 60)} hr ${Math.round(min % 60)} min ${commute}`;
   };
+
+  // Format distance
   const formatDistance = (km) => {
     if (km < 1) return `${Math.round(km * 1000)}m`;
     return `${km.toFixed(1)}km`;
@@ -100,7 +95,7 @@ const ListingCard = ({ listing, commuteType }) => {
           justifyContent: 'space-between',
         }}
       >
-        {/* Address and External Link */}
+        {/* Address */}
         <div
           style={{
             ...styles.flex,
@@ -124,10 +119,6 @@ const ListingCard = ({ listing, commuteType }) => {
               {listing.city}
             </p>
           </div>
-          <ExternalLink
-            size={16}
-            style={{ color: '#9CA3AF', flexShrink: 0, marginLeft: '0.5rem' }}
-          />
         </div>
 
         {/* Price */}
@@ -148,16 +139,21 @@ const ListingCard = ({ listing, commuteType }) => {
             ...styles.grid,
             gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '0.5rem',
+            marginBottom: '1rem',
           }}
         >
           <div style={{ ...styles.flex, ...styles.alignCenter, color: '#6B7280' }}>
             <Bed size={16} style={{ marginRight: '0.25rem' }} />
-            <span style={styles.textSm}>{listing.beds} {listing.beds > 1 ? "beds" : "bed"}</span>
+            <span style={styles.textSm}>
+              {listing.beds} {listing.beds > 1 ? 'beds' : 'bed'}
+            </span>
           </div>
 
           <div style={{ ...styles.flex, ...styles.alignCenter, color: '#6B7280' }}>
             <Bath size={16} style={{ marginRight: '0.25rem' }} />
-            <span style={styles.textSm}>{totalBaths} {totalBaths > 1 ? "baths" : "bath"}</span>
+            <span style={styles.textSm}>
+              {totalBaths} {totalBaths > 1 ? 'baths' : 'bath'}
+            </span>
           </div>
 
           <div style={{ ...styles.flex, ...styles.alignCenter, color: '#6B7280' }}>
@@ -167,9 +163,26 @@ const ListingCard = ({ listing, commuteType }) => {
 
           <div style={{ ...styles.flex, ...styles.alignCenter, color: '#6B7280' }}>
             <Clock size={16} style={{ marginRight: '0.25rem' }} />
-            <span style={styles.textSm}>{formatTime(listing.commute_minutes, commuteType)}</span>
+            <span style={styles.textSm}>
+              {formatTime(listing.commute_minutes, commuteType)}
+            </span>
           </div>
         </div>
+
+        {/* See Commute Route Button */}
+        {listing.commute_url && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(listing.commute_url, '_blank');
+            }}
+            style={{
+              ...styles.button,
+            }}
+          >
+            See Commute Route
+          </button>
+        )}
       </div>
     </div>
   );

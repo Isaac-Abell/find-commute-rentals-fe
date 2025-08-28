@@ -137,10 +137,10 @@ const FilterSection = ({
                   e.target.style.boxShadow = 'none';
                 }}
               >
-                <option value="WALK">Walking</option>
-                <option value="DRIVE">Driving</option>
-                <option value="TRANSIT">Public Transit</option>
-                <option value="BICYCLE">Bicycling</option>
+                <option value="walking">Walking</option>
+                <option value="driving">Driving</option>
+                <option value="transit">Public Transit</option>
+                <option value="bicycling">Bicycling</option>
               </select>
             </div>
           </div>
